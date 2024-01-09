@@ -1,0 +1,314 @@
+FRAME 1:
+
+Label: <p>Email (REMOVE AI CREATOR HERE)</p>
+
+Action: Scene 1
+
+---
+
+FRAME 2:
+
+Label: <p>notification (REMOVE AI CREATOR HERE)</p>
+
+Action: Scene 1
+
+---
+
+FRAME 3:
+
+Label: email in
+
+Action: Scene 2
+
+---
+
+FRAME 4:
+
+Label: <p>URGENT hmmmm slide</p>
+
+Action: Scene 2
+
+---
+
+FRAME 5:
+
+Label: <p>holy f--k 15 min?! punch in</p>
+
+Action: Scene 2
+
+---
+
+FRAME 6:
+
+Label: <p>Open AI App</p>
+
+Action: Scene 3
+
+---
+
+FRAME 7:
+
+Label: Typing prompt
+
+Action: Scene 4
+
+---
+
+FRAME 8:
+
+Label: Prompt Response
+
+Action: Scene 5
+
+---
+
+FRAME 9:
+
+Label: Montage of a lotta prompt and response edits
+
+Action: Scene 6
+
+---
+
+FRAME 10:
+
+Label: <p>Response</p>
+
+Action: Scene 7
+
+---
+
+FRAME 11:
+
+Label: Prompt Edit
+
+Action: Scene 8
+
+---
+
+FRAME 12:
+
+Label: Response
+
+Action: Scene 9
+
+---
+
+FRAME 13:
+
+Label: Prompt Edit
+
+Action: Scene 10
+
+---
+
+FRAME 14:
+
+Label: Response
+
+Action: Scene 11
+
+---
+
+FRAME 15:
+
+Label: <p>Prompt Edit VERY ANGRY</p>
+
+Action: Scene 12
+
+---
+
+FRAME 16:
+
+Label: <p>image still has issues</p>
+
+Action: Scene 13
+
+---
+
+FRAME 17:
+
+Label: <p>BAD FACES STILL</p>
+
+Action: Scene 13
+
+---
+
+FRAME 18:
+
+Label: Bad Prompt!
+
+Action: Scene 13
+
+---
+
+FRAME 19:
+
+Label: <p>Too many fingers</p>
+
+Action: Scene 14
+
+---
+
+FRAME 20:
+
+Label: Montage moment!
+
+Action: Scene 15
+
+---
+
+FRAME 21:
+
+Label: MORE PEOPLE
+
+Action: Scene 15
+
+---
+
+FRAME 22:
+
+Label: <p>Random mashing of the keyboard</p>
+
+Action: Scene 16
+
+---
+
+FRAME 23:
+
+Label: <p>AI Typing back</p>
+
+Action: Scene 17
+
+---
+
+FRAME 24:
+
+Label: Montage moment!
+
+Action: Scene 17
+
+---
+
+FRAME 25:
+
+Label: <p>Generating Loadingggggggg</p>
+
+Action: Scene 17
+
+---
+
+FRAME 26:
+
+Label: kjnasfkbjfajklbasfjkbhfas
+
+Action: Scene 18
+
+---
+
+FRAME 27:
+
+Label: <p>Notification</p>
+
+Action: Scene 19
+
+---
+
+FRAME 28:
+
+Label: Open Photoshop
+
+Action: Scene 20
+
+---
+
+FRAME 29:
+
+Label: <p>Select and Edit Montage</p>
+
+Action: Scene 21
+
+---
+
+FRAME 30:
+
+Label: Editing!
+
+Action: Scene 22
+
+---
+
+FRAME 31:
+
+Label: Human Connection with the edit here throughout the montage
+
+Action: Scene 23
+
+---
+
+FRAME 32:
+
+Label: <p>Edit fixed</p>
+
+Action: Scene 24
+
+---
+
+FRAME 33:
+
+Label: Human Connection with the edit here throughout the montage
+
+Action: Scene 25
+
+---
+
+FRAME 34:
+
+Label: <p>full edit save</p>
+
+Action: Scene 26
+
+---
+
+FRAME 35:
+
+Label: <p>Sent and done!</p>
+
+Action: Scene 27
+
+---
+
+FRAME 36:
+
+Label: Prompt-like typing of tagline
+
+Action: Scene 28
+
+---
+
+FRAME 37:
+
+Action: Scene 28
+
+---
+
+FRAME 38:
+
+Action: Scene 28
+
+---
+
+FRAME 39:
+
+Action: Scene 28
+
+---
+
+FRAME 40:
+
+Label: End copy
+
+Action: Scene 28
+
+---
+
