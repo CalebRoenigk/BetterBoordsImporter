@@ -31,8 +31,11 @@ function main() {
     var mainComp = createNewComposition(boordsJSON.name, 1920, 1080, compDuration, true);
     
     // Get data for each board into a more readable format
-    // TODO: Functionalize the code below so it is not all cluttering up the main function
     createSections(mainComp, boordsJSON);
+    
+    // Move the main comp into the comps folder
+    var compsFolder = findFolderByName("Comps", app.project.rootFolder);
+    mainComp.parentFolder = compsFolder;
     
     app.endUndoGroup();
 }
@@ -160,12 +163,10 @@ function createSection(i, sections, mainComp) {
 
     // Add a start marker
     var startMarker = new MarkerValue("Start");
-    startMarker.label = 3; // Green
     sectionComp.markerProperty.setValueAtTime(sectionHandleDuration, startMarker);
 
     // Add an end marker
     var endMarker = new MarkerValue("End");
-    endMarker.label = 14; // Red
     sectionComp.markerProperty.setValueAtTime(section.duration - sectionHandleDuration, endMarker);
 
 
