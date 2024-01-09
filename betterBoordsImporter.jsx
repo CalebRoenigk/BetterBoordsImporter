@@ -23,6 +23,7 @@ function main() {
     var mainComp = createNewComposition(boordsJSON.name, 1920, 1080, compDuration, true);
     
     // Get data for each board into a more readable format
+    // TODO: Functionalize the code below so it is not all cluttering up the main function
     const boordsFrames = [];
     var sectionNames = [];
     const sections = [];
