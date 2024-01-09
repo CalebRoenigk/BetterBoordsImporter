@@ -13,14 +13,14 @@ function readBoordsJSON(filePath) {
 function main() {
     app.beginUndoGroup("Better Boords Importer");
     // Read the boords JSON
-    const boordsJSON = readBoordsJSON("~/Documents/Coding/BetterBoordsImporter/Holiday_Card___AI_isn_t_there/ae.json");
+    const boordsJSON = readBoordsJSON("~/Documents/Coding/BetterBoordsImporter/Holiday_Card___AI_isn_t_there/ae.json"); // TODO: Fix this file path
     
     // Create a new master composition that is the length of the boords JSON
     // Calculate the duration of the comp
     var compDuration = calculateCompDuration(boordsJSON);
     
     // Create the master comp
-    createNewComposition(boordsJSON.name, 1920, 1080, compDuration, true);
+    var mainComp = createNewComposition(boordsJSON.name, 1920, 1080, compDuration, true);
     
     // Get data for each board into a more readable format
     const boordsFrames = [];
@@ -33,9 +33,9 @@ function main() {
         boordsFrames.push(frame);
         currentPlayhead += frameData.duration/1000;
         
-        if(sectionNames.length == 0 || !arrayIncludes(sectionNames, frameData.direction)) {
-            sectionNames.push(frameData.direction);
-            sections.push(new Section(frameData.direction, frameData.startTime));
+        if(sectionNames.length == 0 || !arrayIncludes(sectionNames, frame.section)) {
+            sectionNames.push(frame.section);
+            sections.push(new Section(frame.section, frame.startTime));
         }
     }
     
@@ -48,13 +48,27 @@ function main() {
         }
     }
 
-    alert(JSON.stringify(sections));
+    // Import the boords sound
+    var videoFile = new File("~/Documents/Coding/BetterBoordsImporter/Holiday_Card___AI_isn_t_there/sound.mp4"); // TODO: Fix this file path
+    var importOptions = new ImportOptions(videoFile);
+    var importedVideo = app.project.importFile(importOptions);
+
+    // Move the animatic sounds into the global sounds asset folder
+    var globalAssetsFolder = findFolderByName("`Global Assets", app.project.rootFolder);
+    var globalAudioFolder = findFolderByName("Audio", globalAssetsFolder);
+    var globalSoundsFolder = findFolderByName("Sounds", globalAudioFolder);
+    importedVideo.parentFolder = globalSoundsFolder;
+
+    // Add the video to the composition
+    var videoLayer = mainComp.layers.add(importedVideo);
     
-    // In each section, tally up the duration
+    // Iterate over each section
     for(var i=0; i < sections.length; i++) {
         var section = sections[i];
+        // Tally up the duration of the section
         for(var j=0; j < section.frames.length; j++) {
-            section.duration += section.frames[j].duration;
+            var frame = section.frames[j];
+            section.duration += frame.duration;
         }
 
         // Create folders for the section
@@ -64,12 +78,42 @@ function main() {
         var sectionComp = createNewComposition(section.name, 1920, 1080, section.duration, false);
         // Move the comp into the section folder
         sectionComp.parentFolder = sectionFolder;
+        
+        // Iterate over the boards in the section
+        // TODO: ADD SECTION HANDLES ON BOTH ENDS AND EXTEND BOARDS
+        // TODO: ADD START AND END MARKERS FOR THE SECTION
+        for(var j=0; j < section.frames.length; j++) {
+            var frame = section.frames[j];
+            
+            // Store the board file path
+            var boardFilePath = "~/Documents/Coding/BetterBoordsImporter/Holiday_Card___AI_isn_t_there/" + frame.filePath; // TODO: Fix this file path
+
+            // Import the image
+            var imageFile = new File(boardFilePath);
+            var importOptions = new ImportOptions(imageFile);
+            var importedImage = app.project.importFile(importOptions);
+            
+            // Insert the board into the section
+            var boardLayer = sectionComp.layers.add(importedImage);
+            
+            // Trim the board to its proper duration
+            var boardStartPoint = frame.startTime - section.startTime;
+            boardLayer.inPoint = boardStartPoint;
+            boardLayer.outPoint = boardStartPoint + frame.duration;
+
+            // Move the board image into its section image assets folder
+            var sectionAssetsFolder = findFolderByName("Assets", sectionFolder);
+            var sectionImagesFolder = findFolderByName("Images", sectionAssetsFolder);
+            importedImage.parentFolder = sectionImagesFolder;
+        }
+        
+        // Place the section into the master composition
+        var sectionCompInMain = mainComp.layers.add(sectionComp);
+
+        // Set the in-point and out-point of the nested composition layer
+        sectionCompInMain.startTime = section.startTime;
     }
     
-    // Trim the board to its length and position in the timeline
-    // Create Sections based on the "direction" field in each frame
-    // Move all the board images into their respective sections
-    // Move the section comp into its section folder
     app.endUndoGroup();
 }
 
