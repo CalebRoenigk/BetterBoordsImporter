@@ -42,8 +42,13 @@ function main() {
     // Consolidate the section data
     for(var i=0; i < boordsFrames.length; i++) {
         var frame = boordsFrames[i];
-        sections[frame.section].frames.push(frame);
+        var sectionIndex = findObjectIndexWithPropValueInArray(sections, 'name', frame.section);
+        if(sectionIndex != -1) {
+            sections[sectionIndex].frames.push(frame);
+        }
     }
+
+    alert(JSON.stringify(sections));
     
     // In each section, tally up the duration
     for(var i=0; i < sections.length; i++) {
@@ -51,7 +56,6 @@ function main() {
         for(var j=0; j < section.frames.length; j++) {
             section.duration += section.frames[j].duration;
         }
-        
 
         // Create folders for the section
         var sectionFolder = createSectionFolderStructure(section.name);
@@ -77,6 +81,17 @@ function arrayIncludes(array, value) {
         }
     }
     return false;
+}
+
+function findObjectIndexWithPropValueInArray(array, key, value) {
+    for (var i=0; i < array.length; i++) {
+        var obj = array[i];
+        if(obj[key] == value) {
+            return i;
+        }
+    }
+    
+    return -1;
 }
 
 // Returns the comp duration in seconds given the data from Boords
@@ -695,3 +710,22 @@ if (typeof JSON !== "object") {
         };
     }
 }());
+
+// !----- FINDINDEX POLYFILL (READ ONLY DO NOT MODIFY) -----! //
+Array.prototype.findIndex = Array.prototype.findIndex || function(callback) {
+    if (this === null) {
+        throw new TypeError('Array.prototype.findIndex called on null or undefined');
+    } else if (typeof callback !== 'function') {
+        throw new TypeError('callback must be a function');
+    }
+    var list = Object(this);
+    // Makes sures is always has an positive integer as length.
+    var length = list.length >>> 0;
+    var thisArg = arguments[1];
+    for (var i = 0; i < length; i++) {
+        if ( callback.call(thisArg, list[i], i, list) ) {
+            return i;
+        }
+    }
+    return -1;
+};
