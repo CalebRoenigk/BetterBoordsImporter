@@ -4,6 +4,7 @@
 // Global Variable Storage
 var sectionHandleDuration = 1; // In Seconds TODO: Set value from UI Panel Settings
 var boordsImportFolderFilePath = "~/Documents/GitHub/BetterBoordsImporter/Holiday_Card___AI_isn_t_there/"; // TODO: Assign file path at script run from UI Panel Settings
+var projectFps = 30; // TODO: Set value from UI Panel Settings
 
 // Read JSON from file
 function readBoordsJSON(filePath) {
@@ -37,7 +38,7 @@ function main() {
     var currentPlayhead = 0;
     for(var i=0; i < boordsJSON.frames.length; i++) {
         var frameData = boordsJSON.frames[i];
-        var frameRoundedDuration = roundToFractionalIncrement(frameData.duration/1000, (1/30)); // TODO: Change this increment to match the FPS of the main comp, COMMENT HERE: This line rounds the duration of the frame to a number that fits nicely into the fps in AE, this prevents odd little black bits where missing frame rounding occurs
+        var frameRoundedDuration = roundToFractionalIncrement(frameData.duration/1000, (1/projectFps)); // This line rounds the duration of the frame to a number that fits nicely into the fps in AE, this prevents odd little black missing frames
         var frame = new BoordsFrame(currentPlayhead, frameRoundedDuration, frameData.file_name, i, frameData.direction);
         boordsFrames.push(frame);
         currentPlayhead += frameRoundedDuration;
@@ -107,7 +108,6 @@ function main() {
         
         
         // Iterate over the boards in the section
-        // TODO: ADD START AND END MARKERS FOR THE SECTION
         for(var j=0; j < section.frames.length; j++) {
             var frame = section.frames[j];
             
@@ -189,7 +189,7 @@ function calculateCompDuration(boordsJSON) {
 
 // Creates a new comp
 function createNewComposition(name, width, height, duration, openInViewer) {
-    var newComp = app.project.items.addComp(name, width, height, 1.0, duration, 30); // TODO: Add option for FPS
+    var newComp = app.project.items.addComp(name, width, height, 1.0, duration, projectFps);
     
     if(openInViewer == true) {
         newComp.openInViewer();
