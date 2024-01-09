@@ -1,10 +1,117 @@
-// TODO: Create Script UI Panel
-// TODO: Consider function and features in Script UI Panel, does it need defaults storing? Does it need a progress bar (probs not)
-
 // Global Variable Storage
 var sectionHandleDuration = 1; // In Seconds TODO: Set value from UI Panel Settings
 var boordsImportFolderFilePath = "~/Documents/GitHub/BetterBoordsImporter/Holiday_Card___AI_isn_t_there/"; // TODO: Assign file path at script run from UI Panel Settings
 var projectFps = 30; // TODO: Set value from UI Panel Settings
+
+// TODO: Create Script UI Panel
+// TODO: Consider function and features in Script UI Panel, does it need defaults storing? Does it need a progress bar (probs not)
+/*
+Code for Import https://scriptui.joonas.me — (Triple click to select): 
+{"activeId":8,"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"enabled":true,"varName":"BetterBoordsImporter","windowType":"Palette","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":true,"borderless":false,"resizeable":false},"text":"BetterBoardsImporter","preferredSize":[0,0],"margins":16,"orientation":"column","spacing":10,"alignChildren":["center","top"]}},"item-1":{"id":1,"type":"Button","parentId":3,"style":{"enabled":true,"varName":"ImportButton","text":"Import Folder","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":"Selects the folder you downloaded from Boords.com"}},"item-3":{"id":3,"type":"Group","parentId":0,"style":{"enabled":true,"varName":"ImportGroup","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":8,"alignChildren":["center","fill"],"alignment":"fill"}},"item-4":{"id":4,"type":"EditText","parentId":3,"style":{"enabled":true,"varName":"ImportPath","creationProps":{"noecho":false,"readonly":true,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"~/Desktop/Example","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-5":{"id":5,"type":"Panel","parentId":0,"style":{"enabled":true,"varName":"SettingsPanel","creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Settings","preferredSize":[0,0],"margins":8,"orientation":"column","spacing":10,"alignChildren":["fill","center"],"alignment":"fill"}},"item-6":{"id":6,"type":"Group","parentId":5,"style":{"enabled":true,"varName":"FlagGroup","preferredSize":[0,0],"margins":0,"orientation":"column","spacing":8,"alignChildren":["left","center"],"alignment":null}},"item-7":{"id":7,"type":"Checkbox","parentId":6,"style":{"enabled":true,"varName":"ImportAudioFlag","text":"Import Audio","preferredSize":[0,0],"alignment":null,"helpTip":"Imports the Boords Audio"}},"item-8":{"id":8,"type":"Group","parentId":0,"style":{"enabled":true,"varName":"RunGroup","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":8,"alignChildren":["center","fill"],"alignment":"fill"}},"item-9":{"id":9,"type":"Button","parentId":8,"style":{"enabled":true,"varName":"GenerateAnimatic","text":"Generate Animatic","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":"Runs the script"}},"item-10":{"id":10,"type":"Group","parentId":5,"style":{"enabled":true,"varName":"ValuesGroup","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":8,"alignChildren":["center","fill"],"alignment":"fill"}},"item-11":{"id":11,"type":"EditText","parentId":12,"style":{"enabled":true,"varName":"FPSValue","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":true},"softWrap":false,"text":"30","justify":"center","preferredSize":[0,0],"alignment":null,"helpTip":"The FPS of animatic"}},"item-12":{"id":12,"type":"Group","parentId":10,"style":{"enabled":true,"varName":"FPSGroup","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":8,"alignChildren":["left","center"],"alignment":null}},"item-13":{"id":13,"type":"StaticText","parentId":12,"style":{"enabled":true,"varName":"FPSLabel","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Project FPS","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-15":{"id":15,"type":"StaticText","parentId":16,"style":{"enabled":true,"varName":"HandleLabel","creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"Handle Duration (s)","justify":"left","preferredSize":[0,0],"alignment":null,"helpTip":null}},"item-16":{"id":16,"type":"Group","parentId":10,"style":{"enabled":true,"varName":"HandleDurationGroup","preferredSize":[0,0],"margins":0,"orientation":"row","spacing":10,"alignChildren":["left","center"],"alignment":null}},"item-18":{"id":18,"type":"EditText","parentId":16,"style":{"enabled":true,"varName":"HandleDurationValue","creationProps":{"noecho":false,"readonly":false,"multiline":false,"scrollable":false,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"1","justify":"center","preferredSize":[32,0],"alignment":null,"helpTip":null}}},"order":[0,3,4,1,5,10,12,13,11,16,15,18,6,7,8,9],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"showDialog":true,"functionWrapper":false,"afterEffectsDockable":false,"itemReferenceList":"None"}}
+*/
+
+// BETTERBOORDSIMPORTER
+// ====================
+var BetterBoordsImporter = new Window("palette");
+BetterBoordsImporter.text = "BetterBoardsImporter";
+BetterBoordsImporter.orientation = "column";
+BetterBoordsImporter.alignChildren = ["center","top"];
+BetterBoordsImporter.spacing = 10;
+BetterBoordsImporter.margins = 16;
+
+// IMPORTGROUP
+// ===========
+var ImportGroup = BetterBoordsImporter.add("group", undefined, {name: "ImportGroup"});
+ImportGroup.orientation = "row";
+ImportGroup.alignChildren = ["center","fill"];
+ImportGroup.spacing = 8;
+ImportGroup.margins = 0;
+ImportGroup.alignment = ["fill","top"];
+
+var ImportPath = ImportGroup.add('edittext {properties: {name: "ImportPath", readonly: true}}');
+ImportPath.text = "~/Desktop/Example";
+
+var ImportButton = ImportGroup.add("button", undefined, undefined, {name: "ImportButton"});
+ImportButton.helpTip = "Selects the folder you downloaded from Boords.com";
+ImportButton.text = "Import Folder";
+
+// SETTINGSPANEL
+// =============
+var SettingsPanel = BetterBoordsImporter.add("panel", undefined, undefined, {name: "SettingsPanel"});
+SettingsPanel.text = "Settings";
+SettingsPanel.orientation = "column";
+SettingsPanel.alignChildren = ["fill","center"];
+SettingsPanel.spacing = 10;
+SettingsPanel.margins = 8;
+SettingsPanel.alignment = ["fill","top"];
+
+// VALUESGROUP
+// ===========
+var ValuesGroup = SettingsPanel.add("group", undefined, {name: "ValuesGroup"});
+ValuesGroup.orientation = "row";
+ValuesGroup.alignChildren = ["center","fill"];
+ValuesGroup.spacing = 8;
+ValuesGroup.margins = 0;
+ValuesGroup.alignment = ["fill","center"];
+
+// FPSGROUP
+// ========
+var FPSGroup = ValuesGroup.add("group", undefined, {name: "FPSGroup"});
+FPSGroup.orientation = "row";
+FPSGroup.alignChildren = ["left","center"];
+FPSGroup.spacing = 8;
+FPSGroup.margins = 0;
+
+var FPSLabel = FPSGroup.add("statictext", undefined, undefined, {name: "FPSLabel"});
+FPSLabel.text = "Project FPS";
+
+var FPSValue = FPSGroup.add('edittext {justify: "center", properties: {name: "FPSValue", enterKeySignalsOnChange: true}}');
+FPSValue.helpTip = "The FPS of animatic";
+FPSValue.text = "30";
+
+// HANDLEDURATIONGROUP
+// ===================
+var HandleDurationGroup = ValuesGroup.add("group", undefined, {name: "HandleDurationGroup"});
+HandleDurationGroup.orientation = "row";
+HandleDurationGroup.alignChildren = ["left","center"];
+HandleDurationGroup.spacing = 10;
+HandleDurationGroup.margins = 0;
+
+var HandleLabel = HandleDurationGroup.add("statictext", undefined, undefined, {name: "HandleLabel"});
+HandleLabel.text = "Handle Duration (s)";
+
+var HandleDurationValue = HandleDurationGroup.add('edittext {justify: "center", properties: {name: "HandleDurationValue"}}');
+HandleDurationValue.text = "1";
+HandleDurationValue.preferredSize.width = 32;
+
+// FLAGGROUP
+// =========
+var FlagGroup = SettingsPanel.add("group", undefined, {name: "FlagGroup"});
+FlagGroup.orientation = "column";
+FlagGroup.alignChildren = ["left","center"];
+FlagGroup.spacing = 8;
+FlagGroup.margins = 0;
+
+var ImportAudioFlag = FlagGroup.add("checkbox", undefined, undefined, {name: "ImportAudioFlag"});
+ImportAudioFlag.helpTip = "Imports the Boords Audio";
+ImportAudioFlag.text = "Import Audio";
+
+// RUNGROUP
+// ========
+var RunGroup = BetterBoordsImporter.add("group", undefined, {name: "RunGroup"});
+RunGroup.orientation = "row";
+RunGroup.alignChildren = ["center","fill"];
+RunGroup.spacing = 8;
+RunGroup.margins = 0;
+RunGroup.alignment = ["fill","top"];
+
+var GenerateAnimatic = RunGroup.add("button", undefined, undefined, {name: "GenerateAnimatic"});
+GenerateAnimatic.helpTip = "Runs the script";
+GenerateAnimatic.text = "Generate Animatic";
+
+BetterBoordsImporter.show();
+
+// !----- MAIN FUNCTIONS -----! //
 
 // Read JSON from file
 function readBoordsJSON(filePath) {
