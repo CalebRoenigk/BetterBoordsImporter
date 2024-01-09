@@ -29,9 +29,11 @@ function main() {
     var currentPlayhead = 0;
     for(var i=0; i < boordsJSON.frames.length; i++) {
         var frameData = boordsJSON.frames[i];
-        var frame = new BoordsFrame(currentPlayhead, frameData.duration/1000, frameData.file_name, i, frameData.direction);
+        var frameRoundedDuration = roundToFractionalIncrement(frameData.duration/1000, (1/30)); // TODO: Change this increment to match the FPS of the main comp, COMMENT HERE: This line rounds the duration of the frame to a number that fits nicely into the fps in AE, this prevents odd little black bits where missing frame rounding occurs
+        var frame = new BoordsFrame(currentPlayhead, frameRoundedDuration, frameData.file_name, i, frameData.direction);
         boordsFrames.push(frame);
-        currentPlayhead += frameData.duration/1000;
+        currentPlayhead += frameRoundedDuration;
+        
         
         if(sectionNames.length == 0 || !arrayIncludes(sectionNames, frame.section)) {
             sectionNames.push(frame.section);
@@ -212,6 +214,14 @@ function findFolderByName(folderName, searchLevel) {
         }
     }
     return null;
+}
+
+// !----- MISC FUNCTIONS -----! //
+function roundToFractionalIncrement(value, increment) {
+    // Calculate the rounded value to the nearest fractional increment
+    var roundedValue = Math.round(value / increment) * increment;
+
+    return roundedValue;
 }
 
 main();
