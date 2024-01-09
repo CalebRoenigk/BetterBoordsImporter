@@ -1,6 +1,10 @@
 // TODO: Create Script UI Panel
 // TODO: Consider function and features in Script UI Panel, does it need defaults storing? Does it need a progress bar (probs not)
 
+// Global Variable Storage
+var sectionHandleDuration = 1; // In Seconds TODO: Set value from UI Panel Settings
+var boordsImportFolderFilePath = "~/Documents/GitHub/BetterBoordsImporter/Holiday_Card___AI_isn_t_there/"; // TODO: Assign file path at script run from UI Panel Settings
+
 // Read JSON from file
 function readBoordsJSON(filePath) {
 // Create a File object
@@ -16,7 +20,7 @@ function readBoordsJSON(filePath) {
 function main() {
     app.beginUndoGroup("Better Boords Importer");
     // Read the boords JSON
-    const boordsJSON = readBoordsJSON("~/Documents/Coding/BetterBoordsImporter/Holiday_Card___AI_isn_t_there/ae.json"); // TODO: Fix this file path
+    const boordsJSON = readBoordsJSON(boordsImportFolderFilePath + "ae.json");
     
     // Create a new master composition that is the length of the boords JSON
     // Calculate the duration of the comp
@@ -55,7 +59,7 @@ function main() {
     }
 
     // Import the boords sound
-    var videoFile = new File("~/Documents/Coding/BetterBoordsImporter/Holiday_Card___AI_isn_t_there/sound.mp4"); // TODO: Fix this file path
+    var videoFile = new File(boordsImportFolderFilePath + "sound.mp4");
     var importOptions = new ImportOptions(videoFile);
     var importedVideo = app.project.importFile(importOptions);
 
@@ -76,6 +80,9 @@ function main() {
             var frame = section.frames[j];
             section.duration += frame.duration;
         }
+        
+        // Add double the handle duration to the section duration
+        section.duration += sectionHandleDuration * 2;
 
         // Create folders for the section
         var sectionFolder = createSectionFolderStructure(section.name);
@@ -85,14 +92,27 @@ function main() {
         // Move the comp into the section folder
         sectionComp.parentFolder = sectionFolder;
         
+        // Set the start timecode of the section to be a negative value of the handle duration
+        sectionComp.displayStartTime = -sectionHandleDuration;
+        
+        // Add a start marker
+        var startMarker = new MarkerValue("Start");
+        startMarker.label = 3; // Green
+        sectionComp.markerProperty.setValueAtTime(sectionHandleDuration, startMarker);
+
+        // Add an end marker
+        var endMarker = new MarkerValue("End");
+        endMarker.label = 14; // Red
+        sectionComp.markerProperty.setValueAtTime(section.duration - sectionHandleDuration, endMarker);
+        
+        
         // Iterate over the boards in the section
-        // TODO: ADD SECTION HANDLES ON BOTH ENDS AND EXTEND BOARDS
         // TODO: ADD START AND END MARKERS FOR THE SECTION
         for(var j=0; j < section.frames.length; j++) {
             var frame = section.frames[j];
             
             // Store the board file path
-            var boardFilePath = "~/Documents/Coding/BetterBoordsImporter/Holiday_Card___AI_isn_t_there/" + frame.filePath; // TODO: Fix this file path
+            var boardFilePath = boordsImportFolderFilePath + frame.filePath;
 
             // Import the image
             var imageFile = new File(boardFilePath);
@@ -103,9 +123,19 @@ function main() {
             var boardLayer = sectionComp.layers.add(importedImage);
             
             // Trim the board to its proper duration
-            var boardStartPoint = frame.startTime - section.startTime;
-            boardLayer.inPoint = boardStartPoint;
-            boardLayer.outPoint = boardStartPoint + frame.duration;
+            var firstBoardStartOffset = 0;
+            if(j == 0) {
+                firstBoardStartOffset = -sectionHandleDuration;
+            }
+            var lastBoardEndOffset = 0;
+            if(j == section.frames.length - 1) {
+                lastBoardEndOffset = sectionHandleDuration;
+            }
+            
+            var handleOffsetDuration = sectionHandleDuration;
+            var boardStartPoint = (frame.startTime - section.startTime) + handleOffsetDuration;
+            boardLayer.inPoint = boardStartPoint + firstBoardStartOffset;
+            boardLayer.outPoint = boardStartPoint + frame.duration + lastBoardEndOffset;
 
             // Move the board image into its section image assets folder
             var sectionAssetsFolder = findFolderByName("Assets", sectionFolder);
@@ -116,8 +146,10 @@ function main() {
         // Place the section into the master composition
         var sectionCompInMain = mainComp.layers.add(sectionComp);
 
-        // Set the in-point and out-point of the nested composition layer
-        sectionCompInMain.startTime = section.startTime;
+        // Set the position, in-point, and out-point of the section in the main composition
+        sectionCompInMain.startTime = section.startTime - sectionHandleDuration;
+        sectionCompInMain.inPoint = section.startTime;
+        sectionCompInMain.outPoint = section.startTime + (section.duration - (sectionHandleDuration * 2));
     }
     
     app.endUndoGroup();
