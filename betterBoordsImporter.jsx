@@ -1,3 +1,6 @@
+// TODO: Create Script UI Panel
+// TODO: Consider function and features in Script UI Panel, does it need defaults storing? Does it need a progress bar (probs not)
+
 // Read JSON from file
 function readBoordsJSON(filePath) {
 // Create a File object
