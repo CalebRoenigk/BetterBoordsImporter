@@ -21,7 +21,7 @@ function readBoordsJSON(filePath) {
 function main() {
     app.beginUndoGroup("Better Boords Importer");
     // Read the boords JSON
-    const boordsJSON = readBoordsJSON(boordsImportFolderFilePath + "ae.json");
+    var boordsJSON = readBoordsJSON(boordsImportFolderFilePath + "ae.json");
     
     // Create a new master composition that is the length of the boords JSON
     // Calculate the duration of the comp
@@ -32,148 +32,9 @@ function main() {
     
     // Get data for each board into a more readable format
     // TODO: Functionalize the code below so it is not all cluttering up the main function
-    const boordsFrames = [];
-    var sectionNames = [];
-    const sections = [];
-    var currentPlayhead = 0;
-    for(var i=0; i < boordsJSON.frames.length; i++) {
-        var frameData = boordsJSON.frames[i];
-        var frameRoundedDuration = roundToFractionalIncrement(frameData.duration/1000, (1/projectFps)); // This line rounds the duration of the frame to a number that fits nicely into the fps in AE, this prevents odd little black missing frames
-        var frame = new BoordsFrame(currentPlayhead, frameRoundedDuration, frameData.file_name, i, frameData.direction);
-        boordsFrames.push(frame);
-        currentPlayhead += frameRoundedDuration;
-        
-        
-        if(sectionNames.length == 0 || !arrayIncludes(sectionNames, frame.section)) {
-            sectionNames.push(frame.section);
-            sections.push(new Section(frame.section, frame.startTime));
-        }
-    }
-    
-    // Consolidate the section data
-    for(var i=0; i < boordsFrames.length; i++) {
-        var frame = boordsFrames[i];
-        var sectionIndex = findObjectIndexWithPropValueInArray(sections, 'name', frame.section);
-        if(sectionIndex != -1) {
-            sections[sectionIndex].frames.push(frame);
-        }
-    }
-
-    // Import the boords sound
-    var videoFile = new File(boordsImportFolderFilePath + "sound.mp4");
-    var importOptions = new ImportOptions(videoFile);
-    var importedVideo = app.project.importFile(importOptions);
-
-    // Move the animatic sounds into the global sounds asset folder
-    var globalAssetsFolder = findFolderByName("`Global Assets", app.project.rootFolder);
-    var globalAudioFolder = findFolderByName("Audio", globalAssetsFolder);
-    var globalSoundsFolder = findFolderByName("Sounds", globalAudioFolder);
-    importedVideo.parentFolder = globalSoundsFolder;
-
-    // Add the video to the composition
-    var videoLayer = mainComp.layers.add(importedVideo);
-    
-    // Iterate over each section
-    for(var i=0; i < sections.length; i++) {
-        var section = sections[i];
-        // Tally up the duration of the section
-        for(var j=0; j < section.frames.length; j++) {
-            var frame = section.frames[j];
-            section.duration += frame.duration;
-        }
-        
-        // Add double the handle duration to the section duration
-        section.duration += sectionHandleDuration * 2;
-
-        // Create folders for the section
-        var sectionFolder = createSectionFolderStructure(section.name);
-        
-        // Create the composition for the section
-        var sectionComp = createNewComposition(section.name, 1920, 1080, section.duration, false);
-        // Move the comp into the section folder
-        sectionComp.parentFolder = sectionFolder;
-        
-        // Set the start timecode of the section to be a negative value of the handle duration
-        sectionComp.displayStartTime = -sectionHandleDuration;
-        
-        // Add a start marker
-        var startMarker = new MarkerValue("Start");
-        startMarker.label = 3; // Green
-        sectionComp.markerProperty.setValueAtTime(sectionHandleDuration, startMarker);
-
-        // Add an end marker
-        var endMarker = new MarkerValue("End");
-        endMarker.label = 14; // Red
-        sectionComp.markerProperty.setValueAtTime(section.duration - sectionHandleDuration, endMarker);
-        
-        
-        // Iterate over the boards in the section
-        for(var j=0; j < section.frames.length; j++) {
-            var frame = section.frames[j];
-            
-            // Store the board file path
-            var boardFilePath = boordsImportFolderFilePath + frame.filePath;
-
-            // Import the image
-            var imageFile = new File(boardFilePath);
-            var importOptions = new ImportOptions(imageFile);
-            var importedImage = app.project.importFile(importOptions);
-            
-            // Insert the board into the section
-            var boardLayer = sectionComp.layers.add(importedImage);
-            
-            // Trim the board to its proper duration
-            var firstBoardStartOffset = 0;
-            if(j == 0) {
-                firstBoardStartOffset = -sectionHandleDuration;
-            }
-            var lastBoardEndOffset = 0;
-            if(j == section.frames.length - 1) {
-                lastBoardEndOffset = sectionHandleDuration;
-            }
-            
-            var handleOffsetDuration = sectionHandleDuration;
-            var boardStartPoint = (frame.startTime - section.startTime) + handleOffsetDuration;
-            boardLayer.inPoint = boardStartPoint + firstBoardStartOffset;
-            boardLayer.outPoint = boardStartPoint + frame.duration + lastBoardEndOffset;
-
-            // Move the board image into its section image assets folder
-            var sectionAssetsFolder = findFolderByName("Assets", sectionFolder);
-            var sectionImagesFolder = findFolderByName("Images", sectionAssetsFolder);
-            importedImage.parentFolder = sectionImagesFolder;
-        }
-        
-        // Place the section into the master composition
-        var sectionCompInMain = mainComp.layers.add(sectionComp);
-
-        // Set the position, in-point, and out-point of the section in the main composition
-        sectionCompInMain.startTime = section.startTime - sectionHandleDuration;
-        sectionCompInMain.inPoint = section.startTime;
-        sectionCompInMain.outPoint = section.startTime + (section.duration - (sectionHandleDuration * 2));
-    }
+    createSections(mainComp, boordsJSON);
     
     app.endUndoGroup();
-}
-
-// Returns true if a passed array contains a value
-function arrayIncludes(array, value) {
-    for(var i=0; i < array.length; i++) {
-        if(array[i] == value) {
-            return true;
-        }
-    }
-    return false;
-}
-
-function findObjectIndexWithPropValueInArray(array, key, value) {
-    for (var i=0; i < array.length; i++) {
-        var obj = array[i];
-        if(obj[key] == value) {
-            return i;
-        }
-    }
-    
-    return -1;
 }
 
 // Returns the comp duration in seconds given the data from Boords
@@ -216,7 +77,143 @@ function Section(name, startTime) {
     this.frames = [];
 }
 
-// !----- SECTIONS CODE -----! //
+// !----- SECTIONS & MAIN COMP CODE -----! //
+// Creates the sections and places them in the main comp
+function createSections(mainComp, boordsJSON) {
+    const boordsFrames = [];
+    var sectionNames = [];
+    const sections = [];
+    var currentPlayhead = 0;
+    // Create the frame data
+    for(var i=0; i < boordsJSON.frames.length; i++) {
+        var frameData = boordsJSON.frames[i];
+        var frameRoundedDuration = roundToFractionalIncrement(frameData.duration/1000, (1/projectFps)); // This line rounds the duration of the frame to a number that fits nicely into the fps in AE, this prevents odd little black missing frames
+        var frame = new BoordsFrame(currentPlayhead, frameRoundedDuration, frameData.file_name, i, frameData.direction);
+        boordsFrames.push(frame);
+        currentPlayhead += frameRoundedDuration;
+
+
+        if(sectionNames.length == 0 || !arrayIncludes(sectionNames, frame.section)) {
+            sectionNames.push(frame.section);
+            sections.push(new Section(frame.section, frame.startTime));
+        }
+    }
+
+    // Consolidate the section data
+    for(var i=0; i < boordsFrames.length; i++) {
+        var frame = boordsFrames[i];
+        var sectionIndex = findObjectIndexWithPropValueInArray(sections, 'name', frame.section);
+        if(sectionIndex != -1) {
+            sections[sectionIndex].frames.push(frame);
+        }
+    }
+
+    // Import the boords sound
+    importSound(mainComp);
+
+    // Iterate over each section
+    for(var i=0; i < sections.length; i++) {
+        // Create the section
+        createSection(i, sections, mainComp);
+    }
+}
+
+// Imports the sound file from boords
+function importSound(mainComp) {
+    // Import the boords sound
+    var videoFile = new File(boordsImportFolderFilePath + "sound.mp4");
+    var importOptions = new ImportOptions(videoFile);
+    var importedVideo = app.project.importFile(importOptions);
+
+    // Move the animatic sounds into the global sounds asset folder
+    var globalAssetsFolder = findFolderByName("`Global Assets", app.project.rootFolder);
+    var globalAudioFolder = findFolderByName("Audio", globalAssetsFolder);
+    var globalSoundsFolder = findFolderByName("Sounds", globalAudioFolder);
+    importedVideo.parentFolder = globalSoundsFolder;
+
+    // Add the video to the composition
+    var videoLayer = mainComp.layers.add(importedVideo);
+}
+
+// Creates a section
+function createSection(i, sections, mainComp) {
+    var section = sections[i];
+    // Tally up the duration of the section
+    for(var j=0; j < section.frames.length; j++) {
+        var frame = section.frames[j];
+        section.duration += frame.duration;
+    }
+
+    // Add double the handle duration to the section duration
+    section.duration += sectionHandleDuration * 2;
+
+    // Create folders for the section
+    var sectionFolder = createSectionFolderStructure(section.name);
+
+    // Create the composition for the section
+    var sectionComp = createNewComposition(section.name, 1920, 1080, section.duration, false);
+    // Move the comp into the section folder
+    sectionComp.parentFolder = sectionFolder;
+
+    // Set the start timecode of the section to be a negative value of the handle duration
+    sectionComp.displayStartTime = -sectionHandleDuration;
+
+    // Add a start marker
+    var startMarker = new MarkerValue("Start");
+    startMarker.label = 3; // Green
+    sectionComp.markerProperty.setValueAtTime(sectionHandleDuration, startMarker);
+
+    // Add an end marker
+    var endMarker = new MarkerValue("End");
+    endMarker.label = 14; // Red
+    sectionComp.markerProperty.setValueAtTime(section.duration - sectionHandleDuration, endMarker);
+
+
+    // Iterate over the boards in the section
+    for(var j=0; j < section.frames.length; j++) {
+        var frame = section.frames[j];
+
+        // Store the board file path
+        var boardFilePath = boordsImportFolderFilePath + frame.filePath;
+
+        // Import the image
+        var imageFile = new File(boardFilePath);
+        var importOptions = new ImportOptions(imageFile);
+        var importedImage = app.project.importFile(importOptions);
+
+        // Insert the board into the section
+        var boardLayer = sectionComp.layers.add(importedImage);
+
+        // Trim the board to its proper duration
+        var firstBoardStartOffset = 0;
+        if(j == 0) {
+            firstBoardStartOffset = -sectionHandleDuration;
+        }
+        var lastBoardEndOffset = 0;
+        if(j == section.frames.length - 1) {
+            lastBoardEndOffset = sectionHandleDuration;
+        }
+
+        var handleOffsetDuration = sectionHandleDuration;
+        var boardStartPoint = (frame.startTime - section.startTime) + handleOffsetDuration;
+        boardLayer.inPoint = boardStartPoint + firstBoardStartOffset;
+        boardLayer.outPoint = boardStartPoint + frame.duration + lastBoardEndOffset;
+
+        // Move the board image into its section image assets folder
+        var sectionAssetsFolder = findFolderByName("Assets", sectionFolder);
+        var sectionImagesFolder = findFolderByName("Images", sectionAssetsFolder);
+        importedImage.parentFolder = sectionImagesFolder;
+    }
+
+    // Place the section into the master composition
+    var sectionCompInMain = mainComp.layers.add(sectionComp);
+
+    // Set the position, in-point, and out-point of the section in the main composition
+    sectionCompInMain.startTime = section.startTime - sectionHandleDuration;
+    sectionCompInMain.inPoint = section.startTime;
+    sectionCompInMain.outPoint = section.startTime + (section.duration - (sectionHandleDuration * 2));
+}
+
 // Function to create a section folder structure
 function createSectionFolderStructure(sectionName) {
     // Find the specified parent folder or create one if not found
@@ -258,6 +255,28 @@ function roundToFractionalIncrement(value, increment) {
     var roundedValue = Math.round(value / increment) * increment;
 
     return roundedValue;
+}
+
+// Returns true if a passed array contains a value
+function arrayIncludes(array, value) {
+    for(var i=0; i < array.length; i++) {
+        if(array[i] == value) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Finds an object's index within an array, returns -1 if no object is matched
+function findObjectIndexWithPropValueInArray(array, key, value) {
+    for (var i=0; i < array.length; i++) {
+        var obj = array[i];
+        if(obj[key] == value) {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 main();
